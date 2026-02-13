@@ -11,7 +11,6 @@
 
 import { supabase } from './supabase';
 import { sessionManager } from '../utils/sessionManager';
-import { withRetry, handleApiError, classifyError } from '../utils/apiErrorHandler';
 
 // Get backend URL with fallback for misconfigured production environments
 const getBackendUrl = () => {
@@ -242,11 +241,11 @@ export class SecureAPIClient {
   /**
    * Validate tenant ID format for security
    */
-  private isValidTenantId(tenantId: string): boolean {
-    // Check for UUID format (basic validation)
+private isValidTenantId(tenantId: string): boolean {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return typeof tenantId === 'string' && tenantId.length > 0 && uuidRegex.test(tenantId);
-  }
+    const slugRegex = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/;
+    return typeof tenantId === 'string' && tenantId.length > 0 && (uuidRegex.test(tenantId) || slugRegex.test(tenantId));
+}
 
   /**
    * Clear request cache (useful when tenant changes)
